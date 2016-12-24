@@ -1,20 +1,23 @@
-import sys
-import os
 import requests
 import time
+import tkinter as tk
 from datetime import datetime
 from bs4 import BeautifulSoup
+from functools import partial
+from threading import Thread
 import ctypes  # An included library with Python install.
 
 
 url ='http://network.ntust.edu.tw/flowstatistical.aspx'
 
+# default value of user data
 ip = '140.118.170.224'
-is_warning = True
-warning_threshold = 3000    # in Mega Bytes
 check_cycle = 300           # in second
+warning_threshold = 3500    # in Mega Bytes
+is_warning = True
 
-def get_now_payload():
+
+def get_now_payload(ip):
     date = datetime.now().timetuple()
     year = date[0]
     month = date[1]
@@ -34,25 +37,91 @@ def get_now_payload():
     return payload
 
 
-def main():
+def get_data_usage(download, upload, total, last_update, ipEntry, checkEntry, warningEntry, var):
     while(True):
-        payload = get_now_payload()
-        r = requests.post(url, data=payload)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        raw_data = soup.find_all('td')[1:4]
-        data_usage = []
-        for i in raw_data:
-            tmp = i.text.replace(' ', '')
-            tmp = tmp.replace('\r\n', '')
-            tmp = tmp.replace('(M)', '')
-            data_usage.append(tmp)
+        try:
+            ip = ipEntry.get()
+            check_cycle = int(checkEntry.get())
+            warning_threshold = int(warningEntry.get())
+            if var.get():
+                is_warning = True
+            else:
+                is_warning = False
 
-        print (str(datetime.now()) + '\nDownload: ' + data_usage[0] + '\nUpload: '  + data_usage[1] + '\nTotal data usage: ' + data_usage[2])
-        if int(data_usage[2]) > warning_threshold and is_warning:
-            ctypes.windll.user32.MessageBoxW(0, "Your data usage has reach %s MB" % data_usage[2], "Data usage", 1)
+            payload = get_now_payload(ip)
+            r = requests.post(url, data=payload)
+            soup = BeautifulSoup(r.text, 'html.parser')
+            raw_data = soup.find_all('td')[1:4]
+            data_usage = []
+            for i in raw_data:
+                tmp = i.text.replace(' ', '')
+                tmp = tmp.replace('\r\n', '')
+                #tmp = tmp.replace('(M)', '')
+                data_usage.append(tmp)
+            
+            download.set(data_usage[0])
+            upload.set(data_usage[1])
+            total.set(data_usage[2])
+            last_update.set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            if int(data_usage[2].replace(',', '').replace('(M)', '')) > warning_threshold and is_warning:
+                ctypes.windll.user32.MessageBoxW(0, "Your data usage has reach %s MB" % data_usage[2], "Data usage", 1)
 
-        time.sleep(check_cycle)
+            time.sleep(check_cycle)
+        except:
+            pass
+
+
+def main():
+    root=tk.Tk()
+
+    root.minsize(width=480, height=130)
+    root.maxsize(width=480, height=130)
+    root.title('NTUST Network Data Usage Monitoring')
+    left_frame = tk.Frame(root, width=280-15, height=240-20).place(x=10, y=10)
+    right_frame = tk.Frame(root, width=200-15, height=240-20).place(x=280+5, y=10)
+
+    tk.Label(left_frame, text='IP address:').place(x=20, y=20)
+    ipEntry = tk.Entry(left_frame)
+    ipEntry.insert(0, ip)
+    ipEntry.place(x=140, y=20)
+
+    tk.Label(left_frame, text='check_cycle:').place(x=20, y=45)
+    checkEntry = tk.Entry(left_frame)
+    checkEntry.insert(0, check_cycle)
+    checkEntry.place(x=140, y=45)
+
+    tk.Label(left_frame, text='Warning Threshold:').place(x=20, y=70)
+    warningEntry = tk.Entry(left_frame)
+    warningEntry.insert(0, warning_threshold)
+    warningEntry.place(x=140, y=70)
+
+    tk.Label(left_frame, text='Show warning:').place(x=20, y=95)
+    var = tk.IntVar()
+    isWCB = tk.Checkbutton(left_frame, variable=var)
+    isWCB.select()
+    isWCB.place(x=140, y=95)
+
+    download = tk.StringVar(right_frame)
+    upload = tk.StringVar(right_frame)
+    total = tk.StringVar(right_frame)
+    last_update = tk.StringVar(right_frame)
+
+    tk.Label(right_frame, text='Download:').place(x=295, y=20)
+    tk.Label(right_frame, text='Upload:').place(x=295, y=45)
+    tk.Label(right_frame, text='Total:').place(x=295, y=70)
+    tk.Label(right_frame, text='Last update:').place(x=295, y=95)
+    downloadLbl = tk.Label(right_frame, textvariable=download).place(x=370, y=20)
+    uploadLbl = tk.Label(right_frame, textvariable=upload).place(x=370, y=45)
+    totalLbl = tk.Label(right_frame, textvariable=total).place(x=370, y=70)
+    updateLbl = tk.Label(right_frame, textvariable=last_update).place(x=370, y=95)
+
+    func_arg = partial(get_data_usage, download, upload, total, last_update, ipEntry, checkEntry, warningEntry, var)
+    
+    t = Thread(target=get_data_usage, args=(download, upload, total, last_update, ipEntry, checkEntry, warningEntry, var,) )
+    t.start()
+
+    root.mainloop()
+    #time.sleep(check_cycle)
 
 if __name__ == '__main__':
     main()
-
