@@ -1,0 +1,56 @@
+missing module named resource - imported by posix, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named posix - imported by os, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named _posixsubprocess - imported by subprocess, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named 'org.python' - imported by pickle, xml.sax, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named readline - imported by cmd, code, pdb, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+excluded module named _frozen_importlib - imported by importlib, importlib.abc, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named _winreg - imported by platform, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named _scproxy - imported by urllib.request
+missing module named java - imported by platform, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named 'java.lang' - imported by platform, xml.sax._exceptions, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named vms_lib - imported by platform, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named termios - imported by tty, getpass, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named urllib.unquote - imported by urllib, requests.compat
+missing module named urllib.quote - imported by urllib, requests.compat
+missing module named urllib.unquote_plus - imported by urllib, requests.compat
+missing module named urllib.quote_plus - imported by urllib, requests.compat
+missing module named urllib.getproxies - imported by urllib, requests.compat
+missing module named urllib.proxy_bypass - imported by urllib, requests.compat
+missing module named urllib.urlencode - imported by urllib, requests.compat
+missing module named grp - imported by tarfile, shutil, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named org - imported by copy, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named pwd - imported by posixpath, tarfile, shutil, http.server, webbrowser, netrc, getpass, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named ce - imported by os, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named _dummy_threading - imported by dummy_threading, D:\0.Projects\clone_from_github\python-html-and-stock\html parser.py
+missing module named iconv_codec - imported by bs4.dammit
+missing module named chardet - imported by requests.packages, bs4.dammit
+missing module named cchardet - imported by bs4.dammit
+missing module named lxml - imported by html5lib.treebuilders.etree_lxml, html5lib.treewalkers.lxmletree, bs4.builder._lxml
+missing module named html5lib.treebuilders.base - imported by html5lib.treebuilders, bs4.builder._html5lib
+missing module named StringIO - imported by requests.packages.urllib3.packages.six, six, requests.compat
+missing module named ordereddict - imported by html5lib.treewalkers.etree, html5lib.filters.alphabeticalattributes
+runtime module named six.moves - imported by html5lib.inputstream, html5lib.sanitizer
+missing module named 'genshi.core' - imported by html5lib.treewalkers.genshistream
+missing module named genshi - imported by html5lib.treewalkers.genshistream
+missing module named datrie - imported by html5lib.trie.datrie
+missing module named 'chardet.universaldetector' - imported by html5lib.inputstream
+missing module named charade - imported by html5lib.inputstream
+missing module named 'requests.packages.urllib3.packages.six.moves' - imported by requests.packages.urllib3.exceptions, requests.packages.urllib3.connectionpool, requests.packages.urllib3.connection, requests.packages.urllib3.util.response, requests.packages.urllib3.request, requests.packages.urllib3.response, requests.packages.urllib3.poolmanager
+missing module named Queue - imported by requests.packages.urllib3.connectionpool
+missing module named backports - imported by requests.packages.urllib3.packages.ssl_match_hostname
+missing module named _abcoll - imported by requests.packages.urllib3.packages.ordered_dict
+missing module named dummy_thread - imported by requests.packages.urllib3.packages.ordered_dict
+missing module named thread - imported by requests.packages.urllib3.packages.ordered_dict
+missing module named Cookie - imported by requests.compat
+missing module named cookielib - imported by requests.compat
+missing module named urllib2 - imported by requests.compat
+missing module named urlparse - imported by requests.compat
+missing module named simplejson - imported by requests.compat
+missing module named idna - imported by requests.packages, requests.packages.urllib3.contrib.pyopenssl
+missing module named urllib3 - imported by requests.packages
+missing module named socks - imported by requests.packages.urllib3.contrib.socks
+missing module named certifi - imported by requests.certs
+missing module named 'cryptography.hazmat' - imported by requests.packages.urllib3.contrib.pyopenssl
+missing module named cryptography - imported by requests.packages.urllib3.contrib.pyopenssl
+missing module named OpenSSL - imported by requests.packages.urllib3.contrib.pyopenssl
