@@ -1,4 +1,4 @@
-FlappyBirdClone
+Flappy Bird - Q learning
 ===============
 
 A Flappy Bird Clone made using [python-pygame][1] along with a Q-learning bot.  
@@ -20,9 +20,13 @@ How to
 3. Run `python flappy.py` from the repo's directory
 4. Adjust the FPS by `up` and `down` key
 
+
+Notes
+-----
+
 The bot will typically take about **500** iterations to get **first scores**, and **2500** iteraction to reach **100** scores.  
 It can get on average **50** score and over **300** maximum scores after **5000** iteractions, and could get better if it is trained longer.  
-This is definitely not good enough compare to others' works, which usually can get over 2000 maximum scores  
+This is definitely not good enough compare to [chncyhn][3]' works, which can usually get over 300 average scores and hit over 2000 maximum score
 
 
 ScreenShot

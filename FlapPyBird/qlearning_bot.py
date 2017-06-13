@@ -1,34 +1,48 @@
 """ 
 Q learning bot for flappy bird 
 """
-import numpy as np
 import math
+import numpy as np
+
 
 class Bot():
     """ Q learning bot for flappy bird """
     def __init__(self):
         self.episode = 0
-        self.num_state = (40, 80, 10)       # x_diff, y_diff, y_vel
-        self.state_bound = [[-40, 160], [-200, 200], [-9, 10]]
+        self.num_state = (50, 120, 10)       # x_diff, y_diff, y_vel
+        self.state_bound = [[-60, 190], [-300, 300], [-9, 10]]
         self.lr = 0.70                      # learning rate
-        self.df = 0.99                      # discount factor
-        self.episilon = 0.1
+        self.df = 0.98                      # discount factor
+        self.episilon = self.update_episilon()
         self.q_table = np.zeros(self.num_state + (2,), dtype=float)
-        self.r_table = {'alive':1, 'dead':-1000}
+        self.r_table = {'alive':1, 'dead':-1000, 'score':50}
         self.state = tuple()
         self.action = 0
     
     def update_q_table(self, next_state,reward):
+        """ Q(s,a) = Q(s,a) + alpha*(r + gamma*maxQ(s',a') - Q(s,a)) """
         self.q_table[self.state][self.action] = (1.0 - self.lr) * self.q_table[self.state][self.action] + \
                                                 self.lr * (reward + self.df * np.amax(self.q_table[next_state]))
         self.state = next_state
     
     def select_action(self):
+        """ select an action with episilon greedy """
+        """
+        if self.episilon > np.random.random():
+            self.action = 0 if self.state[1] > self.num_state[1]/2 + 5 else 1
+        else:
+            self.action = np.argmax(self.q_table[self.state])
+        """
         self.action = np.argmax(self.q_table[self.state])
         return self.action
     
-    def observe_reward(self, is_crash):
-        return self.r_table['dead'] if is_crash else self.r_table['alive']
+    def observe_reward(self, is_crash, is_score):
+        if is_crash:
+            return self.r_table['dead']
+        elif is_score:
+            return self.r_table['score']
+        else:
+            return self.r_table['alive']
 
     def observe_new_state(self, playerx, playery, playerVelY, lowerPipes):
         PIPEWIDTH = 50
@@ -43,6 +57,7 @@ class Bot():
         return self.map_state(observation)
 
     def map_state(self, observation):
+        """ Discretize the state and map to np array """
         state_indice = []
         for i in range(len(observation)):
             if observation[i] >= self.state_bound[i][1]:
@@ -58,4 +73,7 @@ class Bot():
         return tuple(state_indice)
 
     def update_episilon(self):
-        self.episilon = max(0.1, min(0.999, math.log10((self.episode+1)/25)))
+        """ For episilon-greedy """
+        min_episolon = .0001
+        episilon = (math.exp(-0.1*self.episode))
+        self.episilon = max(min_episolon, episilon)

@@ -269,7 +269,7 @@ def mainGame(movementInfo):
                         SOUNDS['wing'].play()
             """
 
-        # bot selects an action
+        # the agent selects an action
         action = bot.select_action()
         if action:
             if playery > -2 * IMAGES['player'][0].get_height():
@@ -277,15 +277,6 @@ def mainGame(movementInfo):
                 playerFlapped = True
                 if SOUND_ON:
                     SOUNDS['wing'].play()
-
-        # check for score
-        playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
-        for pipe in upperPipes:
-            pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
-            if pipeMidPos <= playerMidPos < pipeMidPos + 4:
-                score += 1
-                if SOUND_ON:
-                    SOUNDS['point'].play()
 
         # playerIndex basex change
         if (loopIter + 1) % 3 == 0:
@@ -304,8 +295,19 @@ def mainGame(movementInfo):
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
 
+        # check for score
+        is_score = False
+        playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
+        for pipe in upperPipes:
+            pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
+            if pipeMidPos <= playerMidPos < pipeMidPos + 4:
+                score += 1
+                is_score = True
+                if SOUND_ON:
+                    SOUNDS['point'].play()
+
         # observe reward and new state, update Q
-        reward = bot.observe_reward(crashTest[0])
+        reward = bot.observe_reward(crashTest[0], is_score)
         next_state = bot.observe_new_state(playerx, playery, playerVelY, lowerPipes)
         bot.update_q_table(next_state, reward)
         
