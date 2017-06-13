@@ -7,20 +7,22 @@ Based on [sourabhv][2]'s flappy bird, inspired by the work of [chncyhn][3], [Sar
 
 Dependency
 ------
+
 1. numpy
 2. pygame
+
 
 How to
 ------
 
-1. Install Numpy via "pip install numpy"
-2. Install PyGame via "pip install pygame"
+1. Install NumPy via `pip install numpy`
+2. Install PyGame via `pip install pygame`
 3. Run `python flappy.py` from the repo's directory
-4. Adjust the FPS by "up" and "down" key
+4. Adjust the FPS by `up` and `down` key
 
-The bot will take about 500 iterations to get first scores, and 2000 iteraction to get 100 scores.  
-It can get over 300 maximum scores after 5000 iteractions, and could get better if it is trained longer.
-This is definitely not good enough compare to others' works, which usually can get over 2000 maximum scores
+The bot will typically take about **500** iterations to get **first scores**, and **2500** iteraction to reach **100** scores.  
+It can get on average **50** score and over **300** maximum scores after **5000** iteractions, and could get better if it is trained longer.  
+This is definitely not good enough compare to others' works, which usually can get over 2000 maximum scores  
 
 
 ScreenShot

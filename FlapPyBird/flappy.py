@@ -7,7 +7,7 @@ from pygame.locals import *
 
 import qlearning_bot
 
-FPS = 1000
+FPS = 1500
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 SOUND_ON = False
@@ -241,13 +241,11 @@ def mainGame(movementInfo):
     playerFlapAcc =  -9   # players speed on flapping
     playerFlapped = False # True when player flaps
 
-    # Update episode and get initial state
+
+    # Get initial state
     bot.episode += 1
     bot.update_episilon()
-    x_diff = lowerPipes[0]['x'] - playerx
-    y_diff = lowerPipes[0]['y'] - playery
-    observation = [x_diff, y_diff, playerVelY]
-    bot.state = bot.map_state(observation)
+    bot.state = bot.observe_new_state(playerx, playery, playerVelY, lowerPipes)
     print ("Episode", bot.episode)
 
     # Begin episode
@@ -257,9 +255,9 @@ def mainGame(movementInfo):
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN and event.key == K_UP:
-                if FPS < 1000:  FPS += 50
+                if FPS < 1500:  FPS += 60
             if event.type == KEYDOWN and event.key == K_DOWN:
-                if FPS > 50:  FPS -= 50
+                if FPS > 60:  FPS -= 60
             """
             Deactivate press-key function
 
@@ -271,9 +269,8 @@ def mainGame(movementInfo):
                         SOUNDS['wing'].play()
             """
 
-        # bot do action
-        #print (observation, bot.state, bot.q_table[bot.state])
-        action = bot.get_action()
+        # bot selects an action
+        action = bot.select_action()
         if action:
             if playery > -2 * IMAGES['player'][0].get_height():
                 playerVelY = playerFlapAcc
@@ -304,17 +301,12 @@ def mainGame(movementInfo):
         playerHeight = IMAGES['player'][playerIndex].get_height()
         playery += min(playerVelY, BASEY - playery - playerHeight)
 
-        # check for crash here, count reward, update Q
-        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)   
-        reward = bot.r_table['die'] if crashTest[0] else bot.r_table['frame']
+        # check for crash here
+        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
 
-        if lowerPipes[0]['x']-playerx > - PIPEWIDTH: checked_pipe = lowerPipes[0]
-        else: checked_pipe = lowerPipes[1]
-
-        x_diff = checked_pipe['x'] - playerx
-        y_diff = checked_pipe['y'] - playery
-        observation = [x_diff, y_diff, playerVelY]
-        next_state = bot.map_state(observation)
+        # observe reward and new state, update Q
+        reward = bot.observe_reward(crashTest[0])
+        next_state = bot.observe_new_state(playerx, playery, playerVelY, lowerPipes)
         bot.update_q_table(next_state, reward)
         
         if crashTest[0]:

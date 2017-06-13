@@ -14,7 +14,7 @@ class Bot():
         self.df = 0.99                      # discount factor
         self.episilon = 0.1
         self.q_table = np.zeros(self.num_state + (2,), dtype=float)
-        self.r_table = {'frame':1, 'die':-1000}
+        self.r_table = {'alive':1, 'dead':-1000}
         self.state = tuple()
         self.action = 0
     
@@ -22,6 +22,25 @@ class Bot():
         self.q_table[self.state][self.action] = (1.0 - self.lr) * self.q_table[self.state][self.action] + \
                                                 self.lr * (reward + self.df * np.amax(self.q_table[next_state]))
         self.state = next_state
+    
+    def select_action(self):
+        self.action = np.argmax(self.q_table[self.state])
+        return self.action
+    
+    def observe_reward(self, is_crash):
+        return self.r_table['dead'] if is_crash else self.r_table['alive']
+
+    def observe_new_state(self, playerx, playery, playerVelY, lowerPipes):
+        PIPEWIDTH = 50
+        if lowerPipes[0]['x']-playerx > - PIPEWIDTH:
+            checked_pipe = lowerPipes[0]
+        else: 
+            checked_pipe = lowerPipes[1]
+
+        x_diff = checked_pipe['x'] - playerx
+        y_diff = checked_pipe['y'] - playery
+        observation = [x_diff, y_diff, playerVelY]
+        return self.map_state(observation)
 
     def map_state(self, observation):
         state_indice = []
@@ -37,10 +56,6 @@ class Bot():
                 state_indice.append(index)
         
         return tuple(state_indice)
-    
-    def get_action(self):
-        self.action = np.argmax(self.q_table[self.state])
-        return self.action
-                
+
     def update_episilon(self):
         self.episilon = max(0.1, min(0.999, math.log10((self.episode+1)/25)))
