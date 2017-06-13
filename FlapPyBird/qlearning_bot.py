@@ -8,8 +8,8 @@ class Bot():
     """ Q learning bot for flappy bird """
     def __init__(self):
         self.episode = 0
-        self.num_state = (30, 60, 10)       # x_diff, y_diff, y_vel
-        self.state_bound = [[-40, 260], [-300, 300], [-9, 10]]
+        self.num_state = (40, 80, 10)       # x_diff, y_diff, y_vel
+        self.state_bound = [[-40, 160], [-200, 200], [-9, 10]]
         self.lr = 0.70                      # learning rate
         self.df = 0.99                      # discount factor
         self.episilon = 0.1

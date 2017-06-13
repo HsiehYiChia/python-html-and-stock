@@ -13,7 +13,7 @@ SCREENHEIGHT = 512
 SOUND_ON = False
 # amount by which base can maximum shift to left
 PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
-PIPEWIDTH = 52
+PIPEWIDTH = 50
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
@@ -248,7 +248,7 @@ def mainGame(movementInfo):
     y_diff = lowerPipes[0]['y'] - playery
     observation = [x_diff, y_diff, playerVelY]
     bot.state = bot.map_state(observation)
-    print ("Episode", bot.episode, "", end="")
+    print ("Episode", bot.episode)
 
     # Begin episode
     while True:
@@ -272,7 +272,7 @@ def mainGame(movementInfo):
             """
 
         # bot do action
-        print (observation, bot.state, bot.q_table[bot.state])
+        #print (observation, bot.state, bot.q_table[bot.state])
         action = bot.get_action()
         if action:
             if playery > -2 * IMAGES['player'][0].get_height():
@@ -308,7 +308,7 @@ def mainGame(movementInfo):
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)   
         reward = bot.r_table['die'] if crashTest[0] else bot.r_table['frame']
 
-        if lowerPipes[0]['x']-playerx > -PIPEWIDTH: checked_pipe = lowerPipes[0]
+        if lowerPipes[0]['x']-playerx > - PIPEWIDTH: checked_pipe = lowerPipes[0]
         else: checked_pipe = lowerPipes[1]
 
         x_diff = checked_pipe['x'] - playerx

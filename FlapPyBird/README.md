@@ -1,24 +1,27 @@
 FlappyBirdClone
 ===============
 
-A Flappy Bird Clone made using [python-pygame][1]
+A Flappy Bird Clone made using [python-pygame][1] along with a Q-learning bot.  
+Based on [sourabhv][2]'s flappy bird, inspired by the work of [chncyhn][3], [SarvagyaVaish][4] and [YueDayu][5]
 
-How-to
+
+Dependency
+------
+1. numpy
+2. pygame
+
+How to
 ------
 
-1. Install Python 2.7.X or 3.5.x from [here](https://www.python.org/download/releases/)
+1. Install Numpy via "pip install numpy"
+2. Install PyGame via "pip install pygame"
+3. Run `python flappy.py` from the repo's directory
+4. Adjust the FPS by "up" and "down" key
 
-2. Install PyGame 1.9.X from [here](http://www.pygame.org/download.shtml)
+The bot will take about 500 iterations to get first scores, and 2000 iteraction to get 100 scores.  
+It can get over 300 maximum scores after 5000 iteractions, and could get better if it is trained longer.
+This is definitely not good enough compare to others' works, which usually can get over 2000 maximum scores
 
-3. Clone this repository: `git clone https://github.com/sourabhv/FlappyBirdClone.git` or click `Download ZIP` in right panel and extract it.
-
-4. Run `python flappy.py` from the repo's directory
-
-5. use <kbd>&uarr;</kbd> or <kbd>Space</kbd> key to play and <kbd>Esc</kbd> to close the game.
-
-  (Note: Install pyGame for same version python as above)
-
-  (For x64 windows, get exe [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygame))
 
 ScreenShot
 ----------
@@ -26,3 +29,7 @@ ScreenShot
 ![Flappy Bird](screenshot1.png)
 
 [1]: http://www.pygame.org
+[2]: https://github.com/sourabhv/FlapPyBird
+[3]: https://github.com/chncyhn/flappybird-qlearning-bot
+[4]: https://github.com/SarvagyaVaish/FlappyBirdRL
+[5]: https://www.zhihu.com/question/26408259
