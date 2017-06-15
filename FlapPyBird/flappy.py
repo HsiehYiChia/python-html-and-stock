@@ -307,19 +307,19 @@ def mainGame(movementInfo):
                     SOUNDS['point'].play()
 
         # observe reward and new state, update Q
-        reward = bot.observe_reward(crashTest[0], is_score)
+        reward = bot.observe_reward(crashTest[0], is_score, playerx, playery, playerVelY, upperPipes)
         next_state = bot.observe_new_state(playerx, playery, playerVelY, lowerPipes)
         bot.update_q_table(next_state, reward)
-        
+
         if crashTest[0]:
             return {
-                    'y': playery,
-                    'groundCrash': crashTest[1],
-                    'basex': basex,
-                    'upperPipes': upperPipes,
-                    'lowerPipes': lowerPipes,
-                    'score': score,
-                    'playerVelY': playerVelY,
+                'y': playery,
+                'groundCrash': crashTest[1],
+                'basex': basex,
+                'upperPipes': upperPipes,
+                'lowerPipes': lowerPipes,
+                'score': score,
+                'playerVelY': playerVelY,
                 }
 
         # move pipes to left
@@ -339,7 +339,7 @@ def mainGame(movementInfo):
             lowerPipes.pop(0)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        SCREEN.blit(IMAGES['background'], (0, 0))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))

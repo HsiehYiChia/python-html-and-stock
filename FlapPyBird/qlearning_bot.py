@@ -4,6 +4,12 @@ Q learning bot for flappy bird
 import math
 import numpy as np
 
+PIPE_WIDTH = 50
+PLAYER_WIDTH = 34
+PLAYER_HEIGHT = 24
+JUMP_MAX_HEIGHT = 45           # (9 + 1) * 9 / 2
+JUMP_HORI_DIS = 36             # 4 * 9
+PIPE_GAP_SIZE = 100
 
 class Bot():
     """ Q learning bot for flappy bird """
@@ -15,7 +21,7 @@ class Bot():
         self.df = 0.98                      # discount factor
         self.episilon = self.update_episilon()
         self.q_table = np.zeros(self.num_state + (2,), dtype=float)
-        self.r_table = {'alive':1, 'dead':-1000, 'score':50}
+        self.r_table = {'alive':1, 'dead':-1000, 'score':50, 'bad_jump':-1000}
         self.state = tuple()
         self.action = 0
     
@@ -36,20 +42,25 @@ class Bot():
         self.action = np.argmax(self.q_table[self.state])
         return self.action
     
-    def observe_reward(self, is_crash, is_score):
+    def observe_reward(self, is_crash, is_score, playerx, playery, playerVelY, lowerPipes):
         if is_crash:
             return self.r_table['dead']
         elif is_score:
             return self.r_table['score']
+        elif self.action:                  # check whether it is bad jump or not
+            checked_pipe = lowerPipes[0] if lowerPipes[0]['x']-playerx > - PIPE_WIDTH else lowerPipes[1]
+            is_x_crash = True if (checked_pipe['x'] - JUMP_HORI_DIS) < (playerx + PLAYER_WIDTH) else False
+            is_y_crash = True if (checked_pipe['y'] - PIPE_GAP_SIZE) > (playery - JUMP_MAX_HEIGHT) else False
+            if is_x_crash and is_y_crash:
+                return self.r_table['bad_jump']
+            else:
+                return self.r_table['alive']
+
         else:
             return self.r_table['alive']
 
     def observe_new_state(self, playerx, playery, playerVelY, lowerPipes):
-        PIPEWIDTH = 50
-        if lowerPipes[0]['x']-playerx > - PIPEWIDTH:
-            checked_pipe = lowerPipes[0]
-        else: 
-            checked_pipe = lowerPipes[1]
+        checked_pipe = lowerPipes[0] if lowerPipes[0]['x']-playerx > - PIPE_WIDTH else lowerPipes[1]
 
         x_diff = checked_pipe['x'] - playerx
         y_diff = checked_pipe['y'] - playery
