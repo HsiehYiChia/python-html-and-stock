@@ -65,6 +65,6 @@ if __name__ == '__main__':
     print('Time table between {} -> {}'.format(start_sta, end_sta))
     print('Date: {}'.format(date))
     print('Price: {}'.format(coach_price))
-    print('{:>10} {:>10} {:>12} {:>10}'.format('Train No.', 'Departure', 'Destination', 'Duration'))
+    print('{:>10} {:>10} {:>10} {:>10}'.format('Train No.', 'Departure', 'Arrival', 'Duration'))
     for train in trains:
-        print('{:>10} {:>10} {:>12} {:>10}'.format(train['TrainNumber'], train['DepartureTime'], train['DestinationTime'], train['Duration']))
+        print('{:>10} {:>10} {:>10} {:>10}'.format(train['TrainNumber'], train['DepartureTime'], train['DestinationTime'], train['Duration']))
