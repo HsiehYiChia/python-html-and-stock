@@ -2,14 +2,15 @@ import time
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
 
 
 def get_station_hash():
-    print('getting station hash for post requests...')
-    sta_hash = {}
+    #print('getting station hash for post requests...')
 
     # get THSR timetable result page
-    req = requests.get('https://www.thsrc.com.tw/tw/TimeTable/SearchResult')
+    thsr_timetable_result_url = 'https://www.thsrc.com.tw/tw/TimeTable/SearchResult'
+    req = requests.get(thsr_timetable_result_url)
     encode = req.apparent_encoding
     req.encoding = encode
 
@@ -17,19 +18,14 @@ def get_station_hash():
     soup = BeautifulSoup(req.text, 'html.parser')
     stations = soup.find('select', id='StartStation')
     stations = stations.find_all('option')
+    sta_hash = {}
     for sta in stations[1:]:
         hash = sta['value']
         name = sta.text
         sta_hash[name] = hash
     return sta_hash
     
-
-
-
-
-
-if __name__ == '__main__':
-    thsr_home_url = 'https://www.thsrc.com.tw/index.html'
+def get_thsr_timetable():
     thsr_timetable_url = 'https://www.thsrc.com.tw/tw/TimeTable/Search'
 
     sta_hash = get_station_hash()
@@ -68,3 +64,47 @@ if __name__ == '__main__':
     print('{:>10} {:>10} {:>10} {:>10}'.format('Train No.', 'Departure', 'Arrival', 'Duration'))
     for train in trains:
         print('{:>10} {:>10} {:>10} {:>10}'.format(train['TrainNumber'], train['DepartureTime'], train['DestinationTime'], train['Duration']))
+
+
+def book_thsr_ticket():
+    thsr_booking_url = 'https://irs.thsrc.com.tw/IMINT/'
+    thsr_booking_submit_url = 'https://irs.thsrc.com.tw/IMINT/?wicket:interface=:4:BookingS1Form:1:IFormSubmitListener'
+    formdata = {
+        'BookingS1Form:hf:0': '',
+        'selectStartStation': '2',
+        'selectDestinationStation': '5',
+        'trainCon:trainRadioGroup': '0',
+        'seatCon:seatRadioGroup': 'radio17',
+        'bookingMethod': '1',
+        'toTimeInputField': '2019/05/27',
+        'toTimeTable': '',
+        'toTrainIDInputField': '0809',
+        'backTimeInputField': '2019/05/27',
+        'backTimeTable': '',
+        'backTrainIDInputField': '',
+        'ticketPanel:rows:0:ticketAmount': '1F',
+        'ticketPanel:rows:1:ticketAmount': '0H',
+        'ticketPanel:rows:2:ticketAmount': '0W',
+        'ticketPanel:rows:3:ticketAmount': '0E',
+        'ticketPanel:rows:4:ticketAmount': '0P',
+        'homeCaptcha:securityCode': 'QZ2T',
+        'SubmitButton': '開始查詢'
+    } 
+
+    headers = {'user-agent': 'My User Agent 1.0'}
+    cookies = {'from-my': 'browser'}
+    req = requests.get(thsr_booking_url, headers=headers, cookies=cookies)
+    encode = req.apparent_encoding
+    req.encoding = encode
+    soup = BeautifulSoup(req.text, 'html.parser')
+    img = soup.find('img')
+    img_url = img.get('src')
+    img_url = re.sub(';[\w=]*', '', img_url)
+    url = 'https://irs.thsrc.com.tw'+img_url
+    print(url)
+
+
+if __name__ == '__main__':
+    pass
+    #get_thsr_timetable()
+    book_thsr_ticket()
