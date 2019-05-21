@@ -1,20 +1,20 @@
+import os
 import time
 import requests
 from bs4 import BeautifulSoup
 import json
 import re
+import cv2
+import numpy as np
 
 
 def get_station_hash():
-    #print('getting station hash for post requests...')
-
     # get THSR timetable result page
     thsr_timetable_result_url = 'https://www.thsrc.com.tw/tw/TimeTable/SearchResult'
     req = requests.get(thsr_timetable_result_url)
-    encode = req.apparent_encoding
-    req.encoding = encode
+    req.encoding = req.apparent_encoding
 
-    # parsing the page
+    # parse to get station hash for post requests in get_thsr_timetable
     soup = BeautifulSoup(req.text, 'html.parser')
     stations = soup.find('select', id='StartStation')
     stations = stations.find_all('option')
@@ -52,8 +52,7 @@ def get_thsr_timetable():
     'DiscountType': ''
     } 
     req = requests.post(thsr_timetable_url, data=formdata)
-    encode = req.apparent_encoding
-    req.encoding = encode
+    req.encoding = req.apparent_encoding
 
     result = json.loads(req.text)
     trains = result['data']['DepartureTable']['TrainItem']
@@ -65,6 +64,60 @@ def get_thsr_timetable():
     for train in trains:
         print('{:>10} {:>10} {:>10} {:>10}'.format(train['TrainNumber'], train['DepartureTime'], train['DestinationTime'], train['Duration']))
 
+
+def get_secyrityCode_img():
+    print('Images will be saved in security_code_image/ folder')
+    print('Maximum 600 images can be fetched for single run')
+    try:
+        os.mkdir('security_code_image')
+        print('create security_code_image/ folder')
+    except:
+        pass
+
+
+    # use session because we need to use cookies
+    thsr_booking_url = 'https://irs.thsrc.com.tw/IMINT/'
+    session = requests.Session()
+    headers = {'user-agent': 'My User Agent 1.0'}
+    cookies = {'from-my': 'browser'}
+    
+    for i in range(0, 600):
+        # get html of booking ticket page
+        req = session.get(thsr_booking_url, headers=headers, cookies=cookies)
+        req.encoding = req.apparent_encoding
+
+        # parse security code image url
+        soup = BeautifulSoup(req.text, 'html.parser')
+        img = soup.find('img')
+        img_url = img.get('src')
+        img_url = re.sub(';[\w=]*', '', img_url)
+        img_url = 'https://irs.thsrc.com.tw'+img_url
+        print(i, img_url)
+        req = session.get(img_url, headers=headers, cookies=cookies)
+        with open('security_code_image/'+str(i)+'.png', 'wb') as file:
+            file.write(req.content)
+            file.flush()
+
+def train_security_code_model(images_path):
+    try:
+        os.mkdir('pre_processed')
+    except:
+        pass
+        
+    for i in range(0, 600):
+        img = cv2.imread(images_path+str(i)+'.png', 0)
+        ret, threshImg = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
+        kernel = np.ones((3,3),np.uint8)
+        dilation = cv2.dilate(img,kernel,iterations = 1)
+        erosion = cv2.erode(threshImg, kernel, iterations = 1)
+
+        cv2.imshow("Original Img", img)
+        cv2.imshow("Binary Img", threshImg)
+        cv2.imshow("Pre Process Img", dilation)
+        cv2.waitKey(500)
+    cv2.destroyAllWindows()
+
+        
 
 def book_thsr_ticket():
     thsr_booking_url = 'https://irs.thsrc.com.tw/IMINT/'
@@ -91,20 +144,24 @@ def book_thsr_ticket():
         'SubmitButton': '開始查詢'
     } 
 
-    headers = {'user-agent': 'My User Agent 1.0'}
-    cookies = {'from-my': 'browser'}
-    req = requests.get(thsr_booking_url, headers=headers, cookies=cookies)
-    encode = req.apparent_encoding
-    req.encoding = encode
-    soup = BeautifulSoup(req.text, 'html.parser')
-    img = soup.find('img')
-    img_url = img.get('src')
-    img_url = re.sub(';[\w=]*', '', img_url)
-    url = 'https://irs.thsrc.com.tw'+img_url
-    print(url)
+
+def help():
+    filename = os.path.basename(__file__)
+    print('Usage for ' + filename)
+    print('        timetable:     get time table of THSR')
+    print('        getSecImg:     get security code images for training')
+    print('        trainSecModel: train security code recognition model')
+    print('        bookTicket:    book THSR ticket')
 
 
 if __name__ == '__main__':
-    pass
-    #get_thsr_timetable()
-    book_thsr_ticket()
+    help()
+    command = input()
+    if command == 'timetable':
+        get_thsr_timetable()
+    elif command == 'getSecImg':
+        get_secyrityCode_img()
+    elif command == 'trainSecModel':
+        train_security_code_model('security_code_image/')
+    elif command == 'bookTicket':
+        book_thsr_ticket()
