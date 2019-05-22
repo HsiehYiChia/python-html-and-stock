@@ -1,5 +1,7 @@
 import os
+import sys
 import time
+import argparse
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -145,23 +147,28 @@ def book_thsr_ticket():
     } 
 
 
-def help():
-    filename = os.path.basename(__file__)
-    print('Usage for ' + filename)
-    print('        timetable:     get time table of THSR')
-    print('        getSecImg:     get security code images for training')
-    print('        trainSecModel: train security code recognition model')
-    print('        bookTicket:    book THSR ticket')
-
-
 if __name__ == '__main__':
-    help()
-    command = input()
-    if command == 'timetable':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--timetable',
+        action='store_true', default=False, dest='timetable', help='get time table of THSR')
+    parser.add_argument('-g', '--get_sec',
+        action='store_true', default=False, dest='get_sec', help='get security code images for training')
+    parser.add_argument('-T', '--train_sec',
+        action='store_true', default=False, dest='train_sec', help='train security code recognition model')
+    parser.add_argument('-b', '--book_ticket',
+        action='store_true', default=False, dest='book_ticket', help='book THSR ticket')
+    args = parser.parse_args()
+
+    
+    if args.timetable == True:
         get_thsr_timetable()
-    elif command == 'getSecImg':
+    if args.get_sec == True:
         get_secyrityCode_img()
-    elif command == 'trainSecModel':
+    if args.train_sec == True:
         train_security_code_model('security_code_image/')
-    elif command == 'bookTicket':
+    if args.book_ticket == True:
         book_thsr_ticket()
+    if len(sys.argv) <= 1:
+        parser.print_help()
+
+    
