@@ -8,6 +8,8 @@ import json
 import re
 import cv2
 import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
 
 
 def get_station_hash():
@@ -100,6 +102,34 @@ def get_secyrityCode_img():
             file.write(req.content)
             file.flush()
 
+def de_noise_and_curveline(src):
+    denoise_img = cv2.fastNlMeansDenoisingColored(src, None, 30, 10, 7, 21)
+    ret, thresh_img = cv2.threshold(denoise_img, 127, 255, cv2.THRESH_BINARY_INV)
+
+    # take only first 5 and last 5 column for curve line regression
+    imgarr = cv2.cvtColor(thresh_img, cv2.COLOR_BGR2GRAY)
+    imgarr[:, 5:-5] = 0
+    imagedata = np.where(imgarr == 255)
+
+    # create polynominal regression 
+    height, width = imgarr.shape
+    X = np.array([imagedata[1]])
+    Y = height - imagedata[0]
+    poly_reg = PolynomialFeatures(degree=2)
+    X_ = poly_reg.fit_transform(X.T)
+    regr = LinearRegression().fit(X_, Y)
+    
+    X2 = np.array([[i for i in range(0,width)]])
+    X2_ = poly_reg.fit_transform(X2.T)
+    curve_line_img = np.zeros((height, width, 1), np.uint8)
+    dst =  cv2.cvtColor(thresh_img, cv2.COLOR_BGR2GRAY)
+    for ele in np.column_stack([regr.predict(X2_).round(0),X2[0],] ):
+        pos = height-int(ele[0])
+        curve_line_img[pos-3:pos+3,int(ele[1])] = 255
+        dst[pos-3:pos+3,int(ele[1])] = 255 - dst[pos-3:pos+3,int(ele[1])]
+
+    return dst
+
 def train_security_code_model(images_path):
     try:
         os.mkdir('pre_processed')
@@ -107,15 +137,16 @@ def train_security_code_model(images_path):
         pass
         
     for i in range(0, 600):
-        img = cv2.imread(images_path+str(i)+'.png', 0)
-        ret, threshImg = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
-        kernel = np.ones((3,3),np.uint8)
-        dilation = cv2.dilate(img,kernel,iterations = 1)
-        erosion = cv2.erode(threshImg, kernel, iterations = 1)
+        src_path = images_path+str(i)+'.png'
+        dst_path = 'pre_processed/'+str(i)+'.png'
+        print('training', src_path)
+        src = cv2.imread(src_path, cv2.IMREAD_COLOR)
+        
+        dst = de_noise_and_curveline(src)
+        cv2.imwrite(dst_path, dst)
 
-        cv2.imshow("Original Img", img)
-        cv2.imshow("Binary Img", threshImg)
-        cv2.imshow("Pre Process Img", dilation)
+        cv2.imshow("Original Img", src)
+        cv2.imshow("dst", dst)
         cv2.waitKey(500)
     cv2.destroyAllWindows()
 
